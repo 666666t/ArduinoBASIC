@@ -19,6 +19,11 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+KeyboardLoop();
+}
+
+void KeyboardLoop()
+{
   if (keyboard.available()) 
   {
     char c = keyboard.read();
@@ -27,13 +32,17 @@ void loop() {
       ReadAndAdd();
     } else if (c == PS2_DELETE || c == PS2_BACKSPACE) {
       lineBuffer.remove((lineBuffer.length() - 1));
+    } else {
+      lineBuffer += c;
     }
   }
 }
 
-
 void ReadAndAdd()
 {
-  
+  for(int charNum = 0; charNum <= lineBuffer.length(); charNum++)
+  {
+    
+  }
 }
 
