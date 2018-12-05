@@ -1,12 +1,14 @@
 #include <PS2Keyboard.h>
 
 const int DP = 8;
-const int IP = 5;
+const int IP = 3;
 
 PS2Keyboard keyboard;
 String basicProg = "";
 String lineBuffer = "";
+String wordBuffer = "";
 int currentLine = 0;
+int spaceNum = 0;
 
 
 void setup() {
@@ -28,7 +30,9 @@ void KeyboardLoop()
   {
     char c = keyboard.read();
 
+    Serial.print(c);
     if (c == PS2_ENTER) {
+      Serial.println("");
       ReadAndAdd();
     } else if (c == PS2_DELETE || c == PS2_BACKSPACE) {
       lineBuffer.remove((lineBuffer.length() - 1));
@@ -40,9 +44,28 @@ void KeyboardLoop()
 
 void ReadAndAdd()
 {
+  spaceNum = 0;
+  basicProg += ',';
   for(int charNum = 0; charNum <= lineBuffer.length(); charNum++)
   {
-    
+    if(lineBuffer[charNum] != ' ')
+    {
+      wordBuffer += lineBuffer[charNum];
+    }
+    else if(lineBuffer[charNum] == ' ')
+    {
+      TokenizeCom(charNum);
+      Serial.println(wordBuffer);
+      Serial.println(basicProg);
+      break;
+    }
   }
+
+  lineBuffer = "";
+}
+
+void TokenizeCom(int charNum)
+{
+  
 }
 
