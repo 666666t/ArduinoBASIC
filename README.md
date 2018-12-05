@@ -7,13 +7,16 @@ This project was/is made for a HS-level final project for a digital electronics 
 The interpreter is intended to follow the pattern of receiving each string line-by-line via PS/2 keyboard input, searching an inputted line to tokenize the command and delimit each command before inserting it into a string, which, upon execution, will simply iterate through the string and execute the proper instructions accordingly.
 
 Example:
--10 LET A = 5
--20 PRINT A
--30 PRINT "Looping String, Complete with symbols"
--40 GOTO 30
 
+-10 LET A = 5  
+-20 PRINT A  
+-30 PRINT "Looping String, Complete with symbols"  
+-40 GOTO 30  
+ 
 assuming each line is separated by Linebreaks/Enter presses, and the dashes at the start of each line are not present, 
-the example would be tokenized and compressed into ',L10C01PA=5,L20C03P(A),L30C03P"Looping String, Complete with symbols",L40C02P30'.
+the example would be tokenized and compressed into  
+
+',L10C01PA=5,L20C03P(A),L30C03P"Looping String, Complete with symbols",L40C02P30'.
 
 Each command is made up of a set of parts, and is delimited by a comma between commands.
 
