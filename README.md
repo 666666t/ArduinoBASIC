@@ -18,7 +18,9 @@ the example would be tokenized and compressed into ',L10C01PA=5,L20C03P(A),L30C0
 Each command is made up of a set of parts, and is delimited by a comma between commands.
 
 -L<x> marks the line number of each command, and is included for commands like GOTO
+  
 -C<x> represents the tokenized commands, which, while not yet determined in final, use C01 for LET, C02 for GOTO, and C03 for PRINT in the example.
+  
 -P<x> represents any parameters a command may take, and the compression may vary based on the command. For Example, LET's parameter takes text to the left of an = sign to a variable name, and numbers to the right as the data.
 variables used inside the compressed string will use (<var>) as a notation for readability.
 
