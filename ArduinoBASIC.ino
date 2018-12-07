@@ -7,6 +7,7 @@ PS2Keyboard keyboard;
 String basicProg = "";
 String lineBuffer = "";
 String wordBuffer = "";
+String tokenBuffer = "";
 int currentLine = 0;
 int spaceNum = 0;
 
@@ -44,28 +45,76 @@ void KeyboardLoop()
 
 void ReadAndAdd()
 {
-  spaceNum = 0;
-  basicProg += ',';
-  for(int charNum = 0; charNum <= lineBuffer.length(); charNum++)
+  char firstChar = lineBuffer[0];
+  if(lineBuffer.length() == 3) {CheckRun();}
+  else if(isDigit(firstChar)) {NumRead();}
+  TokenizeCom();
+  Serial.println(basicProg);
+  Serial.println(lineBuffer);
+  lineBuffer = "";
+}
+
+void CheckRun()
+{
+  if(lineBuffer[0] != ' ')
+  {
+    for(int charNum = 0; charNum < lineBuffer.length(); charNum++)
+    {
+      wordBuffer += lineBuffer[charNum];
+    }
+    wordBuffer.toUpperCase();
+    if(wordBuffer == "RUN")
+    {
+      wordBuffer = "";
+      lineBuffer = "";
+      basicProg += ',';
+      RunProg();
+    }
+  }
+}
+
+void NumRead()
+{
+  bool stringStarted = false;
+  if(lineBuffer.length() > 0 && lineBuffer[0] != ' ') {tokenBuffer += ",L";}
+  for(int charNum = 0; charNum < lineBuffer.length(); charNum++)
+  {
+    if(lineBuffer[charNum] != ' ')
+    {
+      tokenBuffer += lineBuffer[charNum];
+    }
+    else
+    {
+      lineBuffer.remove(0, (charNum + 1));
+      break;
+    }
+  }
+}
+
+void TokenizeCom()
+{
+  tokenBuffer += 'C';
+  for(int charNum = 0; charNum < lineBuffer.length(); charNum++)
   {
     if(lineBuffer[charNum] != ' ')
     {
       wordBuffer += lineBuffer[charNum];
     }
-    else if(lineBuffer[charNum] == ' ')
+    if(lineBuffer[charNum] == ' ')
     {
-      TokenizeCom(charNum);
-      Serial.println(wordBuffer);
-      Serial.println(basicProg);
       break;
     }
   }
 
-  lineBuffer = "";
+  
+
+  basicProg += tokenBuffer;
+  tokenBuffer = "";
 }
 
-void TokenizeCom(int charNum)
+void RunProg()
 {
-  
+  Serial.println("PROGRAM IS RUNNING");
+  loop();
 }
 
