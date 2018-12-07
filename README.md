@@ -31,13 +31,13 @@ Operations use LET for variable changing operations (ex. LET a = b + c or LET a 
 
 Included commands will be:
 
-LET - Variable Assignment/Modification; Syntax Example: LET foo = foo + bar  
-PRINT - Visual Output Command; Syntax Example: PRINT "TEXT"
-GOTO - Program Jump Command; Syntax Example: GOTO 10  
-IF - Conditional Statement; Syntax Example: IF foo<bar THEN <operation>
-THEN - Conditional Response Statement; Same Syntax Example as IF
-FOR - Loop Of Given Length; Syntax Example: FOR X = -2 TO 2 STEP 1  
-TO - Provides Range of Values for Loop, Inclusive; Same Syntax as IF
-STEP - Provides Interval of Values for Loop; Same Syntax as IF
-NEXT   
-REM
+LET - Variable Assignment/Modification; Syntax Example: LET foo = foo + bar   
+PRINT - Visual Output Command; Syntax Example: PRINT "TEXT"  
+GOTO - Program Jump Command; Syntax Example: GOTO 10    
+IF - Conditional Statement; Syntax Example: IF foo<bar THEN <operation>  
+THEN - Conditional Response Statement; Same Syntax Example as IF  
+FOR - Loop Of Given Length; Syntax Example: FOR X = -2 TO 2 STEP 1    
+TO - Provides Range of Values for Loop, Inclusive; Same Syntax as IF  
+STEP - Provides Interval of Values for Loop; Same Syntax as IF  
+NEXT - Provides Point for Loop to Restart and increments X by STEP; Syntax Example: FOR X = -2 TO 2 STEP 1 <commands> NEXT  
+REM - Provides Line That is Not Executed, Comment line: Syntax Example: REM <comment>  
