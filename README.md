@@ -29,4 +29,15 @@ variables used inside the compressed string will use (<var>) as a notation for r
 
 Operations use LET for variable changing operations (ex. LET a = b + c or LET a = a + b), and basic operations are handled directly (ex. PRINT (a + b) ). Supported mathematic operations will include: + - * / %
 
+Included commands will be:
 
+LET - Variable Assignment/Modification; Syntax Example: LET foo = foo + bar  
+PRINT - Visual Output Command; Syntax Example: PRINT "TEXT"
+GOTO - Program Jump Command; Syntax Example: GOTO 10  
+IF - Conditional Statement; Syntax Example: IF foo<bar THEN <operation>
+THEN - Conditional Response Statement; Same Syntax Example as IF
+FOR - Loop Of Given Length; Syntax Example: FOR X = -2 TO 2 STEP 1  
+TO - Provides Range of Values for Loop, Inclusive; Same Syntax as IF
+STEP - Provides Interval of Values for Loop; Same Syntax as IF
+NEXT   
+REM
