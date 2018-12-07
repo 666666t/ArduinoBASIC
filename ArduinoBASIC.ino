@@ -13,7 +13,7 @@ int spaceNum = 0;
 
 
 void setup() {
-  // put your setup code here, to run once:
+  //Give time for keyboard to init, start serial monior for debug
   delay(1000);
   keyboard.begin(DP, IP);
   Serial.begin(9600);
@@ -30,7 +30,7 @@ void KeyboardLoop()
   if (keyboard.available()) 
   {
     char c = keyboard.read();
-
+    // Checks the last keypress, adds it to the line buffer if it's a standard char, removes 1 character on backspace and pushes the line on enter
     Serial.print(c);
     if (c == PS2_ENTER) {
       Serial.println("");
@@ -46,6 +46,8 @@ void KeyboardLoop()
 void ReadAndAdd()
 {
   char firstChar = lineBuffer[0];
+  
+  //RUN does not go into the program, so it follows a different execution condition
   if(lineBuffer.length() == 3) {CheckRun();}
   else if(isDigit(firstChar)) {NumRead();}
   TokenizeCom();
@@ -56,8 +58,10 @@ void ReadAndAdd()
 
 void CheckRun()
 {
+  // Input should not start with a space in any case, breaks in case of invalid syntax
   if(lineBuffer[0] != ' ')
   {
+    //creates a word from the string, not necessary for RUN but consisten
     for(int charNum = 0; charNum < lineBuffer.length(); charNum++)
     {
       wordBuffer += lineBuffer[charNum];
@@ -65,6 +69,7 @@ void CheckRun()
     wordBuffer.toUpperCase();
     if(wordBuffer == "RUN")
     {
+      //Clears All Used Buffers, Runs Program
       wordBuffer = "";
       lineBuffer = "";
       basicProg += ',';
@@ -76,11 +81,14 @@ void CheckRun()
 void NumRead()
 {
   bool stringStarted = false;
+  //Adds beginning of token if string starts with proper syntax
   if(lineBuffer.length() > 0 && lineBuffer[0] != ' ') {tokenBuffer += ",L";}
+  //Creates a string consisting of the numbers up to the first space
   for(int charNum = 0; charNum < lineBuffer.length(); charNum++)
   {
     if(lineBuffer[charNum] != ' ')
     {
+      //Adds Number to Token Buffer
       tokenBuffer += lineBuffer[charNum];
     }
     else
@@ -93,7 +101,9 @@ void NumRead()
 
 void TokenizeCom()
 {
+  //Begins Token Addition to String, Space Checking Not Needed Because NumRead Removes Itself + Spaces
   tokenBuffer += 'C';
+  //Create Word From Next Command
   for(int charNum = 0; charNum < lineBuffer.length(); charNum++)
   {
     if(lineBuffer[charNum] != ' ')
@@ -105,7 +115,7 @@ void TokenizeCom()
       break;
     }
   }
-
+//TODO: ADD TOKEN TRANSLATIONS
   
 
   basicProg += tokenBuffer;
