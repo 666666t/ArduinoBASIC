@@ -1,18 +1,30 @@
 #include <PS2Keyboard.h>
-
+//using the PS2Keyboard library for simplicity
 
 const int DP = 8;
 const int IP = 3;
+//Data Pin and Interrupt Pin
 
 PS2Keyboard keyboard;
-String basicProg = "";
-String lineBuffer = "";
+//Keyboard object
+
 String wordBuffer = "";
 String tokenBuffer = "";
+String lineBuffer = "";
+String basicProg = "";
 String progVars = "";
+/* Buffers and Program strings
+wordBuffer - holds direct words read before attaching them or tokenizing, example "PRINT"
+tokenBuffer - holds token before being added at once to the program, example ",L10C1PA=5"
+lineBuffer - holds entire line on input, is taken apart one word at a time
+basicProg - holds tokens delimited by commas, open ending, example ",L10C1PA=5,L20C2P"FOO""
+progVars - holds variables created by program */
+
 int currentLine = 0;
 int currCom = 0;
-int spaceNum = 0;
+/* Basic Variables for Execution and Tokenizing
+currentLine - Stores current line being executed by program
+currCom - Stores current command number */
 
 
 void setup() {
@@ -55,7 +67,7 @@ void KeyboardLoop()
 void ReadAndAdd()
 {
   char firstChar = lineBuffer[0];
-
+  // used solely for differentiating between RUN and a lined command
   
   if(lineBuffer.length() == 3) {CheckRun();}
   else if(isDigit(firstChar)) {NumRead();}
