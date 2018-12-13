@@ -1,24 +1,33 @@
+#include <LiquidCrystal.h>
 #include <PS2Keyboard.h>
 //using the PS2Keyboard library for simplicity
-
-const int DP = 8;
-const int IP = 3;
+const int RS = 12;
+const int EN = 11;
+const int D4 = 10;
+const int D5 = 9;
+const int D6 = 8;
+const int D7 = 7;
+const int DP = 3;
+const int IP = 2;
 //Data Pin and Interrupt Pin
 
 PS2Keyboard keyboard;
-//Keyboard object
+LiquidCrystal lcd(RS, EN, D4, D5, D6, D7);
+//Keyboard and LCD object
 
 String wordBuffer = "";
 String tokenBuffer = "";
 String lineBuffer = "";
+String subLineBuf = "";
+String lastLine = "";
 String basicProg = "";
-String progVars = "";
 /* Buffers and Program strings
 wordBuffer - holds direct words read before attaching them or tokenizing, example "PRINT"
 tokenBuffer - holds token before being added at once to the program, example ",L10C1PA=5"
 lineBuffer - holds entire line on input, is taken apart one word at a time
 basicProg - holds tokens delimited by commas, open ending, example ",L10C1PA=5,L20C2P"FOO""
-progVars - holds variables created by program */
+progVars - holds variables created by program
+subLineBuf and lastLine are just buffers for LCD display */
 
 int currentLine = 0;
 int currCom = 0;
@@ -33,6 +42,8 @@ void setup() {
   keyboard.begin(DP, IP);
   Serial.begin(9600);
   Serial.println("Basic Interpreter v0.0.1");
+  lcd.begin(16,2);
+  lcd.cursor();
 }
 
 
@@ -52,12 +63,26 @@ void KeyboardLoop()
 
     Serial.print(c);
     if (c == PS2_ENTER) {
-      Serial.println("");
+      lastLine = lineBuffer;
+      lcd.clear();
+      lcd.print(lastLine);
+      lcd.setCursor(0,1);
+      
       ReadAndAdd();
     } else if (c == PS2_DELETE || c == PS2_BACKSPACE) {
       lineBuffer.remove((lineBuffer.length() - 1));
+      lcd.clear();
+      lcd.print(lastLine);
+      lcd.setCursor(0,1);
+      if(lineBuffer.length() > 16) {subLineBuf = lineBuffer.substring(lineBuffer.length() - 16);}
+      else {subLineBuf = lineBuffer;}
+      lcd.print(subLineBuf);
     } else {
       lineBuffer += c;
+      lcd.setCursor(0,1);
+      if(lineBuffer.length() > 16) {subLineBuf = lineBuffer.substring(lineBuffer.length() - 16);}
+      else {subLineBuf = lineBuffer;}
+      lcd.print(subLineBuf);
     }
   }
 }
@@ -67,12 +92,16 @@ void KeyboardLoop()
 void ReadAndAdd()
 {
   char firstChar = lineBuffer[0];
-  // used solely for differentiating between RUN and a lined command
+  // used solely for differentiating between RUN and a line command
   
   if(lineBuffer.length() == 3) {CheckRun();}
-  else if(isDigit(firstChar)) {NumRead();}
-  TokenizeCom();
-  InsParm(currCom);
+  else if(isDigit(firstChar))
+  {
+    NumRead();
+    TokenizeCom();
+    InsParm(currCom);
+  }
+
   
   basicProg += tokenBuffer;
 
@@ -86,11 +115,6 @@ void ReadAndAdd()
   wordBuffer = "";
 }
 
-void RunProg()
-{
-  Serial.println("PROGRAM IS RUNNING");
-  loop();
-}
 
 void CheckRun()
 {
@@ -107,7 +131,6 @@ void CheckRun()
     {
       wordBuffer = "";
       lineBuffer = "";
-      basicProg += ',';
       RunProg();
     }
   }
@@ -260,6 +283,32 @@ void InsParm(int currCom)
   }
 }
 
-
+void RunProg()
+{
+  int currCom = 0;
+  int currLin = 0;
+  String currParm = "";
+  for(int i = 0; i < basicProg.length();i++)
+  {
+    bool isQuote = false;
+    if(basicProg[i] == ',' && isQuote == false)
+    {
+      currCom = 0;
+      currLin = 0;
+      currParm = "";
+      
+    }
+    if(basicProg[i] == 'L' && isQuote == false)
+    {
+      while(basicProg[i] != 'C')
+      {
+        wordBuffer += basicProg[i];
+        i++;
+      }
+      currLin = basicProg.toInt();
+    }
+  }
+  loop();
+}
 
 
