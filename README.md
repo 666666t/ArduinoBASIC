@@ -1,7 +1,7 @@
 # ArduinoBASIC
 Incredibly Simple and Cheaply-Written BASIC Interpreter for Arduino
 
-(VERY EARLY VERSION, ENTIRELY NON-FUNCTIONAL)
+STATUS AS OF 2018-12-13: Input and visual output finalized, Program Execution Non-Functional
 
 This project was/is made for a HS-level final project for a digital electronics class.
 The interpreter is intended to follow the pattern of receiving each string line-by-line via PS/2 keyboard input, searching an inputted line to tokenize the command and delimit each command before inserting it into a string, which, upon execution, will simply iterate through the string and execute the proper instructions accordingly.
