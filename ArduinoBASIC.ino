@@ -21,6 +21,7 @@ String lineBuffer = "";
 String subLineBuf = "";
 String lastLine = "";
 String basicProg = "";
+String progVars = "";
 /* Buffers and Program strings
 wordBuffer - holds direct words read before attaching them or tokenizing, example "PRINT"
 tokenBuffer - holds token before being added at once to the program, example ",L10C1PA=5"
@@ -29,7 +30,7 @@ basicProg - holds tokens delimited by commas, open ending, example ",L10C1PA=5,L
 progVars - holds variables created by program
 subLineBuf and lastLine are just buffers for LCD display */
 
-int currentLine = 0;
+int currLin = 0;
 int currCom = 0;
 /* Basic Variables for Execution and Tokenizing
 currentLine - Stores current line being executed by program
@@ -105,9 +106,6 @@ void ReadAndAdd()
   
   basicProg += tokenBuffer;
 
-  Serial.println(currCom);
-  Serial.println(wordBuffer);
-  Serial.println(lineBuffer);
   Serial.println(basicProg);
 
   tokenBuffer = "";
@@ -158,8 +156,6 @@ void NumRead()
     }
   }
 }
-
-
 
 void TokenizeCom()
 {
@@ -285,30 +281,79 @@ void InsParm(int currCom)
 
 void RunProg()
 {
-  int currCom = 0;
-  int currLin = 0;
-  String currParm = "";
-  for(int i = 0; i < basicProg.length();i++)
+  Serial.println("");
+  Serial.println("Execution Begin");
+  if(basicProg[basicProg.length() - 1] != ',') {basicProg += ',';}
+  currCom = 0;
+  currLin = 0;
+  int tokLen = 0;
+  String parmBuffer = "";
+  bool isParm = false;
+  int lastLoc = 0;
+  for(int i = 1; i < basicProg.length(); i++)
   {
-    bool isQuote = false;
-    if(basicProg[i] == ',' && isQuote == false)
+    if(basicProg[i] == ',' && !isParm && currLin > 0)
     {
-      currCom = 0;
-      currLin = 0;
-      currParm = "";
       
+      parmBuffer = basicProg.substring(lastLoc, i);
+      runCom(currCom, parmBuffer);
+      Serial.print("Command ");
+      Serial.print(currCom);
+      Serial.print(" at line ");
+      Serial.print(currLin);
+      Serial.println(" has been run");
     }
-    if(basicProg[i] == 'L' && isQuote == false)
+
+    else if(basicProg[i] == 'L' && !isParm)
     {
+      lastLoc = i + 1;
+      tokLen = i;
       while(basicProg[i] != 'C')
       {
-        wordBuffer += basicProg[i];
+        tokLen++;
         i++;
       }
-      currLin = basicProg.toInt();
+      tokLen++ ;
+      wordBuffer = basicProg.substring(lastLoc, tokLen);
+      currLin = wordBuffer.toInt();
+
+      
+      lastLoc = i + 1;
+      tokLen = i;
+      while(basicProg[i] != 'P' && !isParm)
+      {
+        tokLen++;
+        i++;
+      }
+      tokLen++;
+      wordBuffer = basicProg.substring(lastLoc, tokLen);
+      currCom = wordBuffer.toInt();
+
+      lastLoc = i + 1;
     }
   }
   loop();
+  
 }
 
+
+void runCom(int comNum, String parm)
+{
+  Serial.println(parm);
+  Serial.println(comNum);
+  if(comNum == 1)
+  {
+    if(parm[0] == '(')
+    {
+      for(int i = 1; i < parm.length();i++)
+      {
+        if(parm[i] == ')')
+        {
+          wordBuffer = parm.substring(1, i);
+          Serial.println(wordBuffer); 
+        }
+      }
+    }
+  }
+}
 
