@@ -27,17 +27,17 @@ Each command is made up of a set of parts, and is delimited by a comma between c
 -P<x> represents any parameters a command may take, and the compression may vary based on the command. For Example, LET's parameter takes text to the left of an = sign to a variable name, and numbers to the right as the data.
 variables used inside the compressed string will use (<var>) as a notation for readability.
 
-Operations use LET for variable changing operations (ex. LET a = b + c or LET a = a + b), and basic operations are handled directly (ex. PRINT (a + b) ). Supported mathematic operations will include: + - * / %
+Operations use LET for variable changing operations (ex. LET (a) = ((b) + (c)) or LET (a) = (a) + (b) ), and basic operations are handled directly (ex. PRINT ((a) + (b)). Supported mathematic operations will include: + - * / %
 
 Included commands will be:
 
-LET - Variable Assignment/Modification; Syntax Example: LET foo = foo + bar   
+LET - Variable Assignment/Modification; Syntax Example: LET foo = 5; LET (foo) = 10   
 PRINT - Visual Output Command; Syntax Example: PRINT "TEXT"  
 GOTO - Program Jump Command; Syntax Example: GOTO 10    
-IF - Conditional Statement; Syntax Example: IF foo < bar
+IF - Conditional Statement; Syntax Example: IF (foo) < (bar)
 THEN - Conditional Response Statement; Every Line Contained by an IF Needs THEN; Syntax Example: THEN PRINT "TEXT" 
-FOR - Loop Of Given Length; Syntax Example: FOR X = -2 TO 2 STEP 1    
-TO - Provides Range of Values for Loop, Inclusive; Same Syntax as IF  
-STEP - Provides Interval of Values for Loop; Same Syntax as IF  
+FOR - Loop Of Given Length; Syntax Example: FOR X = -2  
+TO - Provides Range of Values for Loop, Inclusive; Syntax Example: TO x = 5  
+STEP - Provides Interval of Values for Loop; Syntax Example; STEP 1
 NEXT - Provides Point for Loop to Restart and increments X by STEP; Syntax Example: FOR X = -2 TO 2 STEP 1 <commands> NEXT  
 REM - Provides Line That is Not Executed, Comment line: Syntax Example: REM <comment>  
