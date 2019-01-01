@@ -21,7 +21,7 @@ String lineBuffer = "";
 String subLineBuf = "";
 String lastLine = "";
 String basicProg = "";
-String progVars = "";
+String progVars = "TEST=5,MEMES=8,";
 /* Buffers and Program strings
 wordBuffer - holds direct words read before attaching them or tokenizing, example "PRINT"
 tokenBuffer - holds token before being added at once to the program, example ",L10C1PA=5"
@@ -32,6 +32,7 @@ subLineBuf and lastLine are just buffers for LCD display */
 
 int currLin = 0;
 int currCom = 0;
+int progPoint = 0;
 /* Basic Variables for Execution and Tokenizing
 currentLine - Stores current line being executed by program
 currCom - Stores current command number */
@@ -157,6 +158,8 @@ void NumRead()
   }
 }
 
+
+
 void TokenizeCom()
 {
   tokenBuffer += 'C';
@@ -214,21 +217,9 @@ void InsParm(int currCom)
   }
   else if(currCom == 2)
   {
-    bool quotesOpen = false;
-    
     for(int charNum = 0; charNum < lineBuffer.length(); charNum++)
     {
-      if(lineBuffer[charNum] == '"' && quotesOpen == false)
-      {
-        quotesOpen = true;
-        tokenBuffer += lineBuffer[charNum];
-      }
-      else if(lineBuffer[charNum] == '"' && quotesOpen == true)
-      {
-        tokenBuffer += lineBuffer[charNum];
-        break;
-      }
-      else if(quotesOpen == true) {tokenBuffer += lineBuffer[charNum];}
+      if(lineBuffer[charNum] != ' ') {tokenBuffer += lineBuffer[charNum];}
     }
   }
   else if(currCom == 3)
@@ -281,79 +272,134 @@ void InsParm(int currCom)
 
 void RunProg()
 {
-  Serial.println("");
   Serial.println("Execution Begin");
-  if(basicProg[basicProg.length() - 1] != ',') {basicProg += ',';}
   currCom = 0;
   currLin = 0;
-  int tokLen = 0;
   String parmBuffer = "";
-  bool isParm = false;
-  int lastLoc = 0;
-  for(int i = 1; i < basicProg.length(); i++)
+  bool isQuote = false;
+  int parmLoc = 0;
+  if(basicProg[basicProg.length() - 1] != ',') {basicProg += ',';}
+  wordBuffer = "";
+  for(progPoint = 1; progPoint < basicProg.length(); progPoint++)
   {
-    if(basicProg[i] == ',' && !isParm && currLin > 0)
+    if(basicProg[progPoint] == ',' && progPoint != 0)
     {
-      
-      parmBuffer = basicProg.substring(lastLoc, i);
       runCom(currCom, parmBuffer);
-      Serial.print("Command ");
+      Serial.print("Ran command ");
       Serial.print(currCom);
-      Serial.print(" at line ");
-      Serial.print(currLin);
-      Serial.println(" has been run");
+      Serial.print(" with Parameter ");
+      Serial.print(parmBuffer);
+      parmBuffer = "";
+      parmLoc = 0;
+      currCom = 0;
+      currLin = 0;
     }
-
-    else if(basicProg[i] == 'L' && !isParm)
+    if(basicProg[progPoint] == 'L')
     {
-      lastLoc = i + 1;
-      tokLen = i;
-      while(basicProg[i] != 'C')
+      progPoint++;
+      parmLoc = progPoint;
+      while(basicProg[progPoint] != 'C')
       {
-        tokLen++;
-        i++;
+        progPoint++;
       }
-      tokLen++ ;
-      wordBuffer = basicProg.substring(lastLoc, tokLen);
+      wordBuffer = basicProg.substring(parmLoc, progPoint);
       currLin = wordBuffer.toInt();
-
-      
-      lastLoc = i + 1;
-      tokLen = i;
-      while(basicProg[i] != 'P' && !isParm)
+      Serial.println(currLin);
+      progPoint++;
+      parmLoc = progPoint;
+      while(basicProg[progPoint] != 'P')
       {
-        tokLen++;
-        i++;
+        progPoint++;
       }
-      tokLen++;
-      wordBuffer = basicProg.substring(lastLoc, tokLen);
+      wordBuffer = basicProg.substring(parmLoc, progPoint);
       currCom = wordBuffer.toInt();
-
-      lastLoc = i + 1;
+      Serial.println(currCom);
+      progPoint++;
+      parmLoc = progPoint;
+      while(basicProg[progPoint + 1] != ',')
+      {
+        progPoint++;
+      }
+      parmBuffer = basicProg.substring(parmLoc, progPoint + 1);
+      Serial.println(parmBuffer);
     }
-  }
+  }  
   loop();
-  
 }
-
 
 void runCom(int comNum, String parm)
 {
   Serial.println(parm);
   Serial.println(comNum);
-  if(comNum == 1)
+  String parmOut = "";
+  
+  if(comNum == 2)
   {
     if(parm[0] == '(')
     {
-      for(int i = 1; i < parm.length();i++)
+      int i = 1;
+      
+      while(parm[i] != ')')
       {
-        if(parm[i] == ')')
+        parmOut += parm[i];
+        i++;
+      }
+      
+      i = progVars.indexOf(parmOut);
+      if(i != -1)
+      {
+        i += (parmOut.length() + 1);
+        parmOut = "";
+        while(progVars[i] != ',')
         {
-          wordBuffer = parm.substring(1, i);
-          Serial.println(wordBuffer); 
+          parmOut += progVars[i];
+          i++;
         }
+        lastLine = subLineBuf;
+        lcd.clear();
+        lcd.print(lastLine);
+        lcd.setCursor(0,1);
+        lcd.print(parmOut);
+        subLineBuf = parmOut;
+      }
+      else
+      {
+        SynErr();
       }
     }
+    
+    else if(parm[0] == '"')
+    {
+      int i = 1;
+
+      while(parm[i] != '"')
+      {
+        parmOut += parm[i];
+        i++;
+      }
+      lastLine = subLineBuf;
+      lcd.clear();
+      lcd.print(lastLine);
+      lcd.setCursor(0,1);
+      lcd.print(parmOut);
+      subLineBuf = parmOut;
+    }
+    else{SynErr();}
+  }
+  else if(comNum == 3)
+  {
+    parmOut = 'L' + parm;
+    int i = basicProg.indexOf(parmOut);
+    if(i != -1)
+    {
+      progPoint = i;
+    }
+    else {SynErr();}
   }
 }
 
+void SynErr()
+{
+  runCom(2, "\"SYNTAX ERROR\"");
+  while(1){}
+}
