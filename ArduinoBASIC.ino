@@ -219,7 +219,7 @@ void InsParm(int currCom)
   {
     for(int charNum = 0; charNum < lineBuffer.length(); charNum++)
     {
-      if(lineBuffer[charNum] != ' ') {tokenBuffer += lineBuffer[charNum];}
+      tokenBuffer += lineBuffer[charNum];
     }
   }
   else if(currCom == 3)
@@ -285,10 +285,10 @@ void RunProg()
     if(basicProg[progPoint] == ',' && progPoint != 0)
     {
       runCom(currCom, parmBuffer);
-      Serial.print("Ran command ");
-      Serial.print(currCom);
-      Serial.print(" with Parameter ");
-      Serial.print(parmBuffer);
+      //Serial.print("Ran command ");
+      //Serial.print(currCom);
+      //Serial.print(" with Parameter ");
+      //Serial.println(parmBuffer);
       parmBuffer = "";
       parmLoc = 0;
       currCom = 0;
@@ -304,7 +304,7 @@ void RunProg()
       }
       wordBuffer = basicProg.substring(parmLoc, progPoint);
       currLin = wordBuffer.toInt();
-      Serial.println(currLin);
+      //Serial.println(currLin);
       progPoint++;
       parmLoc = progPoint;
       while(basicProg[progPoint] != 'P')
@@ -313,7 +313,7 @@ void RunProg()
       }
       wordBuffer = basicProg.substring(parmLoc, progPoint);
       currCom = wordBuffer.toInt();
-      Serial.println(currCom);
+      //Serial.println(currCom);
       progPoint++;
       parmLoc = progPoint;
       while(basicProg[progPoint + 1] != ',')
@@ -321,7 +321,7 @@ void RunProg()
         progPoint++;
       }
       parmBuffer = basicProg.substring(parmLoc, progPoint + 1);
-      Serial.println(parmBuffer);
+      //Serial.println(parmBuffer);
     }
   }  
   loop();
@@ -329,11 +329,79 @@ void RunProg()
 
 void runCom(int comNum, String parm)
 {
-  Serial.println(parm);
-  Serial.println(comNum);
+  //Serial.println(parm);
+  //Serial.println(comNum);
   String parmOut = "";
+  if(comNum == 1)
+  {
+    if(parm[0] == '(')
+    {
+      if(parm.indexOf('+') == -1 && parm.indexOf('-') == -1 && parm.indexOf('*') == -1 && parm.indexOf('/') == -1)
+      {
+        int endName = parm.indexOf(')');
+        String varName = parm.substring(1, endName);
+        if(progVars.indexOf(varName) == -1) {SynErr();}
+        else
+        {
+          endName = progVars.indexOf(varName);
+          int varLen = 0;
+          while(progVars[endName] != ',')
+          {
+            endName++;
+            varLen++;
+          }
+          progVars.remove(progVars.indexOf(varName), endName + 1);
+          varLen = 0;
+          while(varLen < parm.length())
+          {
+            if(parm[varLen] != '(' && parm[varLen] != ')')
+            {
+              parmOut += parm[varLen]; 
+            }
+            varLen++;
+          }
+
+          progVars += parmOut;
+          progVars += ',';
+        }
+      }
+      else if(parm.indexOf('+') != -1)
+      {
+        
+      }
+      else if(parm.indexOf('-') != -1)
+      {
+        
+      }
+      else if(parm.indexOf('*') != -1)
+      {
+        
+      }
+      else if(parm.indexOf('/') != -1)
+      {
+        
+      }
+      
+    }
+    else
+    {
+      if(parm.indexOf('+') == -1 && parm.indexOf('-') == -1 && parm.indexOf('*') == -1 && parm.indexOf('/') == -1)
+      {
+        String parmName = parm.substring(0, parm.indexOf('='));
+        if(progVars.indexOf(parmName) != -1) {SynErr();}
+        else
+        {
+          progVars += parm;
+        }
+      } 
+    }
+    //Serial.print("Declared Variable ");
+    //Serial.println(parmOut);
+    //Serial.print("Current Varset: ");
+    //Serial.println(progVars);
+  }
   
-  if(comNum == 2)
+  else if(comNum == 2)
   {
     if(parm[0] == '(')
     {
@@ -350,7 +418,7 @@ void runCom(int comNum, String parm)
       {
         i += (parmOut.length() + 1);
         parmOut = "";
-        while(progVars[i] != ',')
+        while(progVars[i] != ',' && i < progVars.length())
         {
           parmOut += progVars[i];
           i++;
@@ -376,6 +444,7 @@ void runCom(int comNum, String parm)
       {
         parmOut += parm[i];
         i++;
+        if(i >= parm.length()) {SynErr();}
       }
       lastLine = subLineBuf;
       lcd.clear();
@@ -383,9 +452,11 @@ void runCom(int comNum, String parm)
       lcd.setCursor(0,1);
       lcd.print(parmOut);
       subLineBuf = parmOut;
+      
     }
     else{SynErr();}
   }
+  
   else if(comNum == 3)
   {
     parmOut = 'L' + parm;
