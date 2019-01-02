@@ -21,7 +21,7 @@ String lineBuffer = "";
 String subLineBuf = "";
 String lastLine = "";
 String basicProg = "";
-String progVars = "TEST=5,MEMES=8,";
+String progVars = "";
 /* Buffers and Program strings
 wordBuffer - holds direct words read before attaching them or tokenizing, example "PRINT"
 tokenBuffer - holds token before being added at once to the program, example ",L10C1PA=5"
@@ -285,10 +285,10 @@ void RunProg()
     if(basicProg[progPoint] == ',' && progPoint != 0)
     {
       runCom(currCom, parmBuffer);
-      //Serial.print("Ran command ");
-      //Serial.print(currCom);
-      //Serial.print(" with Parameter ");
-      //Serial.println(parmBuffer);
+      Serial.print("Ran command ");
+      Serial.print(currCom);
+      Serial.print(" with Parameter ");
+      Serial.println(parmBuffer);
       parmBuffer = "";
       parmLoc = 0;
       currCom = 0;
@@ -339,18 +339,18 @@ void runCom(int comNum, String parm)
       if(parm.indexOf('+') == -1 && parm.indexOf('-') == -1 && parm.indexOf('*') == -1 && parm.indexOf('/') == -1)
       {
         int endName = parm.indexOf(')');
-        String varName = parm.substring(1, endName);
+        String varName = ',' + parm.substring(1, endName) + '=';
         if(progVars.indexOf(varName) == -1) {SynErr();}
         else
         {
           endName = progVars.indexOf(varName);
           int varLen = 0;
-          while(progVars[endName] != ',')
+          while(progVars[endName] != ',' || endName == progVars.indexOf(varName))
           {
             endName++;
             varLen++;
           }
-          progVars.remove(progVars.indexOf(varName), endName + 1);
+          progVars.remove(progVars.indexOf(varName), varLen);
           varLen = 0;
           while(varLen < parm.length())
           {
@@ -361,13 +361,63 @@ void runCom(int comNum, String parm)
             varLen++;
           }
 
-          progVars += parmOut;
           progVars += ',';
+          progVars += parmOut;
         }
       }
       else if(parm.indexOf('+') != -1)
       {
+        String operatorOne = parm.substring(parm.indexOf('=') + 1, parm.indexOf('+'));
+        String operatorTwo = parm.substring(parm.indexOf('+') +1, parm.length());
+
+        if(operatorOne.indexOf('(') != -1)
+        {
+          int varPoint = 0;
+          wordBuffer = "";
+          while(varPoint < operatorOne.length())
+          {
+            if(operatorOne[varPoint] != '(' && operatorOne[varPoint] != ')')
+            {
+              wordBuffer += operatorOne[varPoint];
+            }
+            varPoint++;
+          }
+          
+          operatorOne = ',' + wordBuffer + '=';
+          if(progVars.indexOf(operatorOne) == -1) {SynErr();}
+          operatorOne = progVars.substring(progVars.indexOf('=',progVars.indexOf(operatorOne)) + 1, progVars.indexOf(',', progVars.indexOf(operatorOne) + 1)); 
+        }
         
+        if(operatorTwo.indexOf('(') != -1)
+        {
+          int varPoint = 0;
+          wordBuffer = "";
+          while(varPoint < operatorTwo.length())
+          {
+            if(operatorTwo[varPoint] != '(' && operatorTwo[varPoint] != ')')
+            {
+              wordBuffer += operatorTwo[varPoint];
+            }
+            varPoint++;
+          }
+          operatorTwo = ',' + wordBuffer + '=';
+          if(progVars.indexOf(operatorTwo) == -1) {SynErr();}
+          operatorTwo = progVars.substring(progVars.indexOf('=',progVars.indexOf(operatorTwo)) + 1, progVars.indexOf(',', progVars.indexOf(operatorTwo) + 1)); 
+        }
+
+        parmOut = operatorOne.toInt() + operatorTwo.toInt();
+        int varPoint = 0;
+        wordBuffer = "";
+        while(parm[varPoint] != '=')
+        {
+          {wordBuffer += parm[varPoint];}
+          varPoint++;
+        }
+        parm = wordBuffer + '=' + parmOut;
+        Serial.println(parm);
+        Serial.println(parmOut);
+        runCom(1, parm);
+
       }
       else if(parm.indexOf('-') != -1)
       {
@@ -391,14 +441,15 @@ void runCom(int comNum, String parm)
         if(progVars.indexOf(parmName) != -1) {SynErr();}
         else
         {
+          progVars += ',';
           progVars += parm;
         }
       } 
     }
-    //Serial.print("Declared Variable ");
-    //Serial.println(parmOut);
-    //Serial.print("Current Varset: ");
-    //Serial.println(progVars);
+    Serial.print("Declared Variable ");
+    Serial.println(parmOut);
+    Serial.print("Current Varset: ");
+    Serial.println(progVars);
   }
   
   else if(comNum == 2)
