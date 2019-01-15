@@ -87,6 +87,15 @@ void KeyboardLoop()
       lcd.print(subLineBuf);
     }
   }
+  else 
+  {
+    while(1 != Serial.available()) {}
+    if(Serial.available())
+    {
+      lineBuffer = Serial.readString();
+      ReadAndAdd();
+    }
+  }
 }
 
 
