@@ -1,7 +1,7 @@
 # ArduinoBASIC
 Incredibly Simple and Cheaply-Written BASIC Interpreter for Arduino
 
-# ALMOST EVERYTHING ABOUT THIS PROGRAM IS AWFUL. IT TECHNICALLY WORKS, BUT IT'S SO AWFUL THERE'S NO REAL REASON YOU'D WANT TO.
+# This was a proof of concept for a random assignment as a young'n many years back, and contains atrocities of code that should hardly be poked with a 50 poot pole. You have been warned (:p)
 
 STATUS AS OF 2019-01-01: PRINT/GOTO Working, LET Only Supports Declaration and Direct Changes, Only Math is Addition (Using Negative Numbers Might Be Alternative, Untested)
 
